@@ -34,10 +34,28 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           dry_run: true
           append_to_pre_release_tag: pre
+
       - name: Extract version from tag
         env:
           VERSION_TAG: ${{ steps.guessed_tag_version.outputs.new_tag }}
         run: echo "DOCKER_TAG=$(echo $VERSION_TAG | sed -e "s/^v//" -e "s/-.*$//")" >> $GITHUB_ENV
+
+      - name: Set up QEMU
+        id: qemu
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+      - name: Available QEMU platforms
+        run: echo ${{ steps.qemu.outputs.platforms }}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+      - name: Available Buildx platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
 
       - name: Build, squash and push
         run: |
@@ -124,7 +142,7 @@ jobs:
           VERSION_TAG: ${{ steps.tag_version.outputs.new_tag }}
         run: echo "DOCKER_TAG=${VERSION_TAG#v}" >> $GITHUB_ENV
 
-      - name: Use branch name as version not on master
+      - name: Use branch name as version if not on master
         if: github.ref != 'refs/heads/master'
         run: echo "DOCKER_TAG=${GITHUB_REF##*/}" >> $GITHUB_ENV
 
