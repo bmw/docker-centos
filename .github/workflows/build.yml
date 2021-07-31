@@ -69,29 +69,30 @@ jobs:
           docker buildx build \
             --build-arg TAG=${{ matrix.image.tag }} \
             --platform ${{ matrix.image.archs }} \
-            --tag tgagor/centos:${{ matrix.image.tag }} \
+            --tag ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }} \
+            --squash \
             --push \
             ${{ matrix.image.tag }}/
 
           # squash
-          docker run --name tgagor-${{ matrix.image.tag }} tgagor/centos:${{ matrix.image.tag }} true
-          docker export tgagor-${{ matrix.image.tag }} | docker import \
-            --change 'LABEL maintainer="TiMoR <https://timor.site>"' \
-            --change 'LABEL org.opencontainers.image.authors=TiMoR' \
-            --change 'LABEL org.opencontainers.image.licenses=GPL-2.0' \
-            --change "LABEL org.opencontainers.image.version=$DOCKER_TAG" \
-            --change "LABEL org.opencontainers.image.source=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
-            --change "LABEL org.opencontainers.image.url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
-            --change "LABEL org.opencontainers.image.revision=$GITHUB_SHA" \
-            --change "LABEL org.opencontainers.image.branch=${GITHUB_REF#refs/*/}" \
-            --change "LABEL org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-            - tgagor/centos:${{ matrix.image.tag }}
+          # docker run --name tgagor-${{ matrix.image.tag }} tgagor/centos:${{ matrix.image.tag }} true
+          # docker export tgagor-${{ matrix.image.tag }} | docker import \
+          #   --change 'LABEL maintainer="TiMoR <https://timor.site>"' \
+          #   --change 'LABEL org.opencontainers.image.authors=TiMoR' \
+          #   --change 'LABEL org.opencontainers.image.licenses=GPL-2.0' \
+          #   --change "LABEL org.opencontainers.image.version=$DOCKER_TAG" \
+          #   --change "LABEL org.opencontainers.image.source=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+          #   --change "LABEL org.opencontainers.image.url=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+          #   --change "LABEL org.opencontainers.image.revision=$GITHUB_SHA" \
+          #   --change "LABEL org.opencontainers.image.branch=${GITHUB_REF#refs/*/}" \
+          #   --change "LABEL org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+          #   - tgagor/centos:${{ matrix.image.tag }}
 
           # tag
-          docker tag tgagor/centos:${{ matrix.image.tag }} ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
+          # docker tag tgagor/centos:${{ matrix.image.tag }} ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
 
           # push
-          docker push ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
+          # docker push ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
 
   security-scan:
     runs-on: ubuntu-20.04
