@@ -19,22 +19,15 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        tag:
-          - centos7
-          - centos8
-          - stream8
-          - stream9-development
-        arch:
-          - docker: amd64
-            qemu: linux/amd64
-          - docker: arm32v7
-            qemu: linux/arm/v7
-          - docker: arm64v8
-            qemu: linux/arm64
-          - docker: i386
-            qemu: linux/386
-          - docker: ppc64le
-            qemu: linux/ppc64le
+        image:
+          - tag: centos7
+            archs: linux/amd64,
+          - tag: centos8
+            archs: linux/amd64,linux/arm64,linux/ppc64le
+          - tag: stream8
+            archs: linux/amd64,linux/arm64,linux/ppc64le
+          - tag: stream9-development
+            archs: linux/amd64,linux/arm64,linux/ppc64le
     steps:
       - uses: actions/checkout@v2
 
@@ -73,15 +66,14 @@ jobs:
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
           # build
-          docker build \
-            --build-arg PLATFORM=${{ matrix.arch.docker }} \
-            --build-arg TAG=${{ matrix.tag }} \
-            --platform ${{ matrix.arch.qemu }} \
-            --tag tgagor/centos:${{ matrix.tag }} ${{ matrix.tag }}/
+          docker buildx build \
+            --build-arg TAG=${{ matrix.image.tag }} \
+            --platform ${{ matrix.image.archs }} \
+            --tag tgagor/centos:${{ matrix.image.tag }} ${{ matrix.image.tag }}/
 
           # squash
-          docker run --name tgagor-${{ matrix.tag }} tgagor/centos:${{ matrix.tag }} true
-          docker export tgagor-${{ matrix.tag }} | docker import \
+          docker run --name tgagor-${{ matrix.image.tag }} tgagor/centos:${{ matrix.image.tag }} true
+          docker export tgagor-${{ matrix.image.tag }} | docker import \
             --change 'LABEL maintainer="TiMoR <https://timor.site>"' \
             --change 'LABEL org.opencontainers.image.authors=TiMoR' \
             --change 'LABEL org.opencontainers.image.licenses=GPL-2.0' \
@@ -91,13 +83,13 @@ jobs:
             --change "LABEL org.opencontainers.image.revision=$GITHUB_SHA" \
             --change "LABEL org.opencontainers.image.branch=${GITHUB_REF#refs/*/}" \
             --change "LABEL org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-            - tgagor/centos:${{ matrix.tag }}
+            - tgagor/centos:${{ matrix.image.tag }}
 
           # tag
-          docker tag tgagor/centos:${{ matrix.tag }} ghcr.io/tgagor/centos:${{ matrix.tag }}-${{ github.sha }}
+          docker tag tgagor/centos:${{ matrix.image.tag }} ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
 
           # push
-          docker push ghcr.io/tgagor/centos:${{ matrix.tag }}-${{ github.sha }}
+          docker push ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
 
   security-scan:
     runs-on: ubuntu-20.04
@@ -116,12 +108,12 @@ jobs:
         run: |
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
-          docker pull ghcr.io/tgagor/centos:${{ matrix.tag }}-${{ github.sha }}
+          docker pull ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/tgagor/centos:${{ matrix.tag }}-${{ github.sha }}
+          image-ref: ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
           format: template
           template: '@/contrib/sarif.tpl'
           # don't fail
