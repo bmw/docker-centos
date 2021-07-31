@@ -99,11 +99,11 @@ jobs:
       - build
     strategy:
       matrix:
-        tag:
-          - centos7
-          - centos8
-          - stream8
-          - stream9-development
+        image:
+          - tag: centos7
+          - tag: centos8
+          - tag: stream8
+          - tag: stream9-development
     steps:
       - uses: actions/checkout@v2
       - name: Fetch image
