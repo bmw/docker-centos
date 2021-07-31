@@ -20,14 +20,14 @@ jobs:
     strategy:
       matrix:
         image:
-          - tag: centos7
-            archs: linux/386,linux/amd64
-          - tag: centos8
-            archs: linux/amd64,linux/arm64
+          # - tag: centos7
+          #   archs: linux/386,linux/amd64
+          # - tag: centos8
+          #   archs: linux/amd64,linux/arm64
           - tag: stream8
             archs: linux/amd64,linux/arm64
-          - tag: stream9-development
-            archs: linux/amd64,linux/arm64
+          # - tag: stream9-development
+          #   archs: linux/amd64,linux/arm64
     steps:
       - uses: actions/checkout@v2
 
@@ -112,22 +112,29 @@ jobs:
 
           docker pull ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+      # - name: Run Trivy vulnerability scanner
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     image-ref: ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
+      #     format: template
+      #     template: '@/contrib/sarif.tpl'
+      #     # don't fail
+      #     exit-code: 0
+      #     output: trivy-results.sarif
+      #     severity: CRITICAL,HIGH,MEDIUM
+
+      - name: Scan image with Anchore vulnerability scanner
+        uses: anchore/scan-action@v2
         with:
-          image-ref: ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
-          format: template
-          template: '@/contrib/sarif.tpl'
-          # don't fail
-          exit-code: 0
-          output: trivy-results.sarif
-          severity: CRITICAL,HIGH,MEDIUM
+          image: ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }}
+          acs-report-enable: true
 
       - name: Upload Trivy scan results to GitHub Security tab
         if: github.ref == 'refs/heads/master'
         uses: github/codeql-action/upload-sarif@v1
         with:
-          sarif_file: trivy-results.sarif
+          # sarif_file: trivy-results.sarif
+          sarif_file: results.sarif
 
   release:
     runs-on: ubuntu-20.04
