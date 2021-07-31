@@ -24,7 +24,7 @@ jobs:
           - centos8
           - stream8
           - stream9-development
-        architecture:
+        arch:
           - docker: amd64
             qemu: linux/amd64
           - docker: arm32v7
@@ -75,7 +75,7 @@ jobs:
           # build
           docker build \
             --build-arg TAG=${{ matrix.tag }} \
-            --platform linux/amd64,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le \
+            --platform ${{ matrix.arch.docker }} \
             --tag tgagor/centos:${{ matrix.tag }} ${{ matrix.tag }}/
 
           # squash
