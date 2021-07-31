@@ -74,7 +74,7 @@ jobs:
 
           # build
           docker build \
-            --build-arg PLATFORM=${{ matrix.qrch.docker }} \
+            --build-arg PLATFORM=${{ matrix.arch.docker }} \
             --build-arg TAG=${{ matrix.tag }} \
             --platform ${{ matrix.arch.qemu }} \
             --tag tgagor/centos:${{ matrix.tag }} ${{ matrix.tag }}/
