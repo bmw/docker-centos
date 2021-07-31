@@ -69,7 +69,9 @@ jobs:
           docker buildx build \
             --build-arg TAG=${{ matrix.image.tag }} \
             --platform ${{ matrix.image.archs }} \
-            --tag tgagor/centos:${{ matrix.image.tag }} ${{ matrix.image.tag }}/
+            --tag tgagor/centos:${{ matrix.image.tag }} \
+            --load \
+            ${{ matrix.image.tag }}/
 
           # squash
           docker run --name tgagor-${{ matrix.image.tag }} tgagor/centos:${{ matrix.image.tag }} true
