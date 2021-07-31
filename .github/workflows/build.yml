@@ -24,17 +24,17 @@ jobs:
           - centos8
           - stream8
           - stream9-development
-        # architecture:
-        #   - docker: amd64
-        #     qemu: linux/amd64
-        #   - docker: arm32v7
-        #     qemu: linux/arm/v7
-        #   - docker: arm64v8
-        #     qemu: linux/arm64
-        #   - docker: i386
-        #     qemu: linux/386
-        #   - docker: ppc64le
-        #     qemu: linux/ppc64le
+        architecture:
+          - docker: amd64
+            qemu: linux/amd64
+          - docker: arm32v7
+            qemu: linux/arm/v7
+          - docker: arm64v8
+            qemu: linux/arm64
+          - docker: i386
+            qemu: linux/386
+          - docker: ppc64le
+            qemu: linux/ppc64le
     steps:
       - uses: actions/checkout@v2
 
@@ -74,8 +74,9 @@ jobs:
 
           # build
           docker build \
+            --build-arg PLATFORM=${{ matrix.qrch.docker }} \
             --build-arg TAG=${{ matrix.tag }} \
-            --platform linux/amd64,linux/arm64,linux/386,linux/ppc64le \
+            --platform ${{ matrix.arch.qemu }} \
             --tag tgagor/centos:${{ matrix.tag }} ${{ matrix.tag }}/
 
           # squash
