@@ -1,6 +1,6 @@
 ARG TAG=centos7
 ARG PLATFORM=linux/amd64
-FROM --platform $PLATFORM quay.io/centos/centos:$TAG
+FROM --platform=$PLATFORM quay.io/centos/centos:$TAG
 MAINTAINER TiMoR <https://timor.site>
 
 # upgrade packages
