@@ -70,7 +70,6 @@ jobs:
             --build-arg TAG=${{ matrix.image.tag }} \
             --platform ${{ matrix.image.archs }} \
             --tag ghcr.io/tgagor/centos:${{ matrix.image.tag }}-${{ github.sha }} \
-            --squash \
             --push \
             ${{ matrix.image.tag }}/
 
