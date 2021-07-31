@@ -70,7 +70,7 @@ jobs:
             --build-arg TAG=${{ matrix.image.tag }} \
             --platform ${{ matrix.image.archs }} \
             --tag tgagor/centos:${{ matrix.image.tag }} \
-            --load \
+            --push \
             ${{ matrix.image.tag }}/
 
           # squash
