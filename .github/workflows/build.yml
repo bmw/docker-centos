@@ -25,9 +25,9 @@ jobs:
           - tag: centos8
             archs: linux/amd64,linux/arm64
           - tag: stream8
-            archs: linux/amd64,linux/arm64,linux/s390x
+            archs: linux/amd64,linux/arm64,linux/ppc64le
           - tag: stream9-development
-            archs: linux/amd64,linux/arm64,linux/s390x
+            archs: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
     steps:
       - uses: actions/checkout@v2
 
